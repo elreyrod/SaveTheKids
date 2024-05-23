@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+  </PropertyGroup>
+
+  <!-- Debug build -->
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutDir>../Assemblies/</OutDir>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <Prefer32Bit>false</Prefer32Bit>
+</PropertyGroup>
+<!-- Release build -->
+<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutDir>../Assemblies/</OutDir>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>3</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+</PropertyGroup>
+
+<ItemGroup>
+  <Reference Include="0Harmony">
+      <HintPath>../../References/0Harmony.dll</HintPath>
+      <Private>False</Private>
+  </Reference>
+  <!-- The main game code (RimWorld and Verse) -->
+  <Reference Include="Assembly-CSharp">
+      <HintPath>../../References/Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+  </Reference>
+</ItemGroup>
+
+</Project>
