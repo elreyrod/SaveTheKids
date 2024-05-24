@@ -12,6 +12,10 @@ namespace SaveTheKids
     {
         public static bool IsPawnChild(this Pawn pawn)
         {
+            var count18YearOlds = LoadedModManager.GetMod<SaveTheKidsMod>().GetSettings<SaveTheKidsSettings>().countAllUnder18AsKids;
+
+            if (!count18YearOlds) return !pawn.ageTracker.Adult;
+
             return !pawn.ageTracker.Adult || // IsAdult covers babies through 13
                  pawn.ageTracker.AgeBiologicalYearsFloat < 18.0; // Teenagers are children.
         }
@@ -72,7 +76,9 @@ namespace SaveTheKids
 
         public override AlertReport GetReport()
         {
-            if (getDeadChildrenCount() == 0) { return AlertReport.Inactive; }
+            var show = LoadedModManager.GetMod<SaveTheKidsMod>().GetSettings<SaveTheKidsSettings>().showDeadKidCounter;
+
+            if (!show || getDeadChildrenCount() == 0) { return AlertReport.Inactive; }
 
             return AlertReport.Active;
         }
@@ -103,7 +109,8 @@ namespace SaveTheKids
 
         public override AlertReport GetReport()
         {
-            if (getSavedChildrenCount() == 0) { return AlertReport.Inactive; }
+            var show = LoadedModManager.GetMod<SaveTheKidsMod>().GetSettings<SaveTheKidsSettings>().showSavedKidCounter;
+            if (!show || getSavedChildrenCount() == 0) { return AlertReport.Inactive; }
 
             return AlertReport.Active;
         }
@@ -135,25 +142,32 @@ namespace SaveTheKids
 
         public static void PostDeRegisterPawn(MapPawns __instance, Pawn p)
         {
-            if (p.IsPawnChild() && !p.Dead)
+            try
             {
-                Log.Message($"Pawn saved: {p.Name}");
-                var deathComponent = Find.World.GetChildDeathComponent();
+                if (p.IsPawnChild() && !p.Dead && !p.IsColonist)
+                {
+                    var deathComponent = Find.World.GetChildDeathComponent();
 
-                deathComponent.SavedChildren++;
+                    deathComponent.SavedChildren++;
+                }
             }
+            catch { }
         }
 
         public static void PostPawnKill(Pawn __instance)
         {
-            var pawn = __instance;
-
-            if (pawn.IsPawnChild())
+            try
             {
-                var deathComponent = Find.World.GetChildDeathComponent();
+                var pawn = __instance;
 
-                deathComponent.DeadChildren++;
+                if (pawn.IsPawnChild())
+                {
+                    var deathComponent = Find.World.GetChildDeathComponent();
+
+                    deathComponent.DeadChildren++;
+                }
             }
+            catch { }
         }
     }
 

@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
@@ -15,9 +14,10 @@
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <Prefer32Bit>false</Prefer32Bit>
-</PropertyGroup>
-<!-- Release build -->
-<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  </PropertyGroup>
+  
+  <!-- Release build -->
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutDir>../Assemblies/</OutDir>
@@ -25,18 +25,29 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>3</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-</PropertyGroup>
+  </PropertyGroup>
 
-<ItemGroup>
-  <Reference Include="0Harmony">
+  <ItemGroup>
+    <Reference Include="0Harmony">
       <HintPath>../../References/0Harmony.dll</HintPath>
       <Private>False</Private>
-  </Reference>
-  <!-- The main game code (RimWorld and Verse) -->
-  <Reference Include="Assembly-CSharp">
+    </Reference>
+    <!-- The main game code (RimWorld and Verse) -->
+    <Reference Include="Assembly-CSharp">
       <HintPath>../../References/Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
-  </Reference>
-</ItemGroup>
-
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\References\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\..\References\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\..\References\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
 </Project>
