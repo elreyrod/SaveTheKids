@@ -12,12 +12,22 @@ namespace SaveTheKids
     {
         public static bool IsPawnChild(this Pawn pawn)
         {
+            var isHuman = pawn.RaceProps.Humanlike && !(
+                pawn.RaceProps.Insect ||
+                pawn.RaceProps.IsMechanoid ||
+                pawn.RaceProps.Animal
+                );
+
             var count18YearOlds = LoadedModManager.GetMod<SaveTheKidsMod>().GetSettings<SaveTheKidsSettings>().countAllUnder18AsKids;
+
+            if (!isHuman) return false;
+
+            if (pawn.IsShambler) return false;
 
             if (!count18YearOlds) return !pawn.ageTracker.Adult;
 
-            return !pawn.ageTracker.Adult || // IsAdult covers babies through 13
-                 pawn.ageTracker.AgeBiologicalYearsFloat < 18.0; // Teenagers are children.
+            return !pawn.ageTracker.Adult || 
+                 pawn.ageTracker.AgeBiologicalYearsFloat < 18.0;
         }
 
         public static ChildDeathCounterComponent GetChildDeathComponent(this World world)
@@ -154,7 +164,7 @@ namespace SaveTheKids
             catch { }
         }
 
-        public static void PostPawnKill(Pawn __instance)
+        public static void PostPawnKill(Pawn __instance, DamageInfo? dinfo, Hediff exactCulprit = null)
         {
             try
             {
@@ -165,6 +175,17 @@ namespace SaveTheKids
                     var deathComponent = Find.World.GetChildDeathComponent();
 
                     deathComponent.DeadChildren++;
+
+                    var builder = new StringBuilder();
+                    builder.AppendFormat("{0}, {1}, is dead.", pawn.Name.ToStringShort, pawn.ageTracker.AgeBiologicalYears);
+
+
+                    if (exactCulprit != null)
+                    {
+                        builder.AppendFormat(" Cause {0}.", exactCulprit.Label);
+                    }
+
+                    Messages.Message(builder.ToString(), MessageTypeDefOf.RejectInput, true);
                 }
             }
             catch { }
