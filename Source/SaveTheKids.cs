@@ -12,21 +12,28 @@ namespace SaveTheKids
     {
         public static bool IsPawnChild(this Pawn pawn)
         {
-            var isHuman = pawn.RaceProps.Humanlike && !(
-                pawn.RaceProps.Insect ||
-                pawn.RaceProps.IsMechanoid ||
-                pawn.RaceProps.Animal
-                );
+            try
+            {
+                var isHuman = pawn.RaceProps.Humanlike && !(
+                    pawn.RaceProps.Insect ||
+                    pawn.RaceProps.IsMechanoid ||
+                    pawn.RaceProps.Animal
+                    );
 
-            var count18YearOlds = LoadedModManager.GetMod<SaveTheKidsMod>().GetSettings<SaveTheKidsSettings>().countAllUnder18AsKids;
+                var count18YearOlds = LoadedModManager.GetMod<SaveTheKidsMod>().GetSettings<SaveTheKidsSettings>().countAllUnder18AsKids;
 
-            if (!isHuman) return false;
+                if (!isHuman) return false;
 
-            if (pawn.IsShambler) return false;
+                if (pawn.IsShambler) return false;
 
-            if (!count18YearOlds) return !pawn.ageTracker.Adult;
+                if (!count18YearOlds) return !pawn.ageTracker.Adult;
 
-            return !pawn.ageTracker.Adult || 
+            }
+            catch
+            {
+            }
+
+            return !pawn.ageTracker.Adult ||
                  pawn.ageTracker.AgeBiologicalYearsFloat < 18.0;
         }
 
@@ -158,7 +165,7 @@ namespace SaveTheKids
                 {
                     var deathComponent = Find.World.GetChildDeathComponent();
 
-                    deathComponent.SavedChildren++;
+                    if (deathComponent != null) deathComponent.SavedChildren++;
                 }
             }
             catch { }
@@ -174,7 +181,7 @@ namespace SaveTheKids
                 {
                     var deathComponent = Find.World.GetChildDeathComponent();
 
-                    deathComponent.DeadChildren++;
+                    if (deathComponent != null) deathComponent.DeadChildren++;
 
                     var builder = new StringBuilder();
                     builder.AppendFormat("{0}, {1}, is dead.", pawn.Name.ToStringShort, pawn.ageTracker.AgeBiologicalYears);
