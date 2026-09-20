@@ -4,7 +4,7 @@
     <packageId>ElReyRod.SaveTheKids</packageId>
     <name>Save The Kids</name>
     <supportedVersions>
-        <li>1.5</li>
+        <li>1.6</li>
     </supportedVersions>
     <modDependencies>
     <li>
@@ -14,4 +14,7 @@
         <downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUrl>
     </li>
   </modDependencies>
+  <loadAfter>
+    <li>brrainz.harmony</li>
+  </loadAfter>
 </ModMetaData>

@@ -12,29 +12,48 @@ namespace SaveTheKids
     {
         public static bool IsPawnChild(this Pawn pawn)
         {
+            // A pawn only counts if it is a living human(oid) child:
+            //   * humanlike, and never an animal / insect / mechanoid
+            //   * not undead/anomalous (shambler, ghoul, awoken corpse, anomaly entity) -
+            //     those were never a living child
+            //   * actually young: either not an adult, or under 18 when that setting is on
+            // Anything we cannot confidently classify is treated as "not a child".
+            if (pawn == null) return false;
+
             try
             {
-                var isHuman = pawn.RaceProps.Humanlike && !(
-                    pawn.RaceProps.Insect ||
-                    pawn.RaceProps.IsMechanoid ||
-                    pawn.RaceProps.Animal
-                    );
+                var props = pawn.RaceProps;
+                if (props == null) return false;
 
-                var count18YearOlds = LoadedModManager.GetMod<SaveTheKidsMod>().GetSettings<SaveTheKidsSettings>().countAllUnder18AsKids;
+                var isHuman = props.Humanlike && !(
+                    props.Insect ||
+                    props.IsMechanoid ||
+                    props.Animal
+                    );
 
                 if (!isHuman) return false;
 
+                // Undead / anomalous pawns were never a living child, so they never count.
                 if (pawn.IsShambler) return false;
+                if (pawn.IsGhoul) return false;
+                if (pawn.IsAwokenCorpse) return false;
+                if (props.IsAnomalyEntity) return false;
 
-                if (!count18YearOlds) return !pawn.ageTracker.Adult;
+                var ageTracker = pawn.ageTracker;
+                if (ageTracker == null) return false;
 
+                var count18YearOlds = LoadedModManager.GetMod<SaveTheKidsMod>().GetSettings<SaveTheKidsSettings>().countAllUnder18AsKids;
+
+                if (!count18YearOlds) return !ageTracker.Adult;
+
+                return !ageTracker.Adult ||
+                     ageTracker.AgeBiologicalYearsFloat < 18.0;
             }
             catch
             {
+                // If anything goes wrong we must not default to counting the pawn.
+                return false;
             }
-
-            return !pawn.ageTracker.Adult ||
-                 pawn.ageTracker.AgeBiologicalYearsFloat < 18.0;
         }
 
         public static ChildDeathCounterComponent GetChildDeathComponent(this World world)
@@ -161,12 +180,18 @@ namespace SaveTheKids
         {
             try
             {
-                if (p.IsPawnChild() && !p.Dead && !p.IsColonist)
-                {
-                    var deathComponent = Find.World.GetChildDeathComponent();
+                if (!p.IsPawnChild() || p.Dead || p.IsColonist) return;
 
-                    if (deathComponent != null) deathComponent.SavedChildren++;
-                }
+                // "Saved" = a child that leaves a map alive and is not an enemy:
+                //   * hostile-faction pawns (e.g. a raider child fleeing) did not get saved by us
+                //   * wild/feral children (no faction) were never in our care
+                var faction = p.Faction;
+                if (faction == null) return;
+                if (faction.HostileTo(Faction.OfPlayer)) return;
+
+                var deathComponent = Find.World.GetChildDeathComponent();
+
+                if (deathComponent != null) deathComponent.SavedChildren++;
             }
             catch { }
         }
